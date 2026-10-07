@@ -106,6 +106,15 @@ The "Reload sprites" button reloads the GIFs from disk.
 
 ```bash
 gjs -m test/behavior.test.js
-dbus-run-session gnome-shell --devkit     # GNOME 49+, needs the mutter-dev-bin package
+tools/nested.sh                           # nested shell, needs the mutter-dev-bin package
+source /tmp/homie-nested/env              # in a second terminal
+gnome-extensions enable homie@jonathan
+```
+
+Do not run a plain `dbus-run-session gnome-shell --devkit`. Its settings writes reach your real dconf database and overwrite your enabled extensions. `tools/nested.sh` gives the nested shell its own database.
+
+The nested shell logs to its terminal. The real shell logs to the journal:
+
+```bash
 journalctl -f -o cat /usr/bin/gnome-shell
 ```
