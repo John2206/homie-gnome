@@ -41,3 +41,71 @@ The original buddy has three states: idle, running and click.
 - Dinos start running right away, without a click.
 - The `run-left` setting also mirrors the sprite, so the dino faces where it runs.
 - Animation always uses the `fps` setting. The GIF's own frame delays are ignored.
+
+## Install
+
+```bash
+git clone https://github.com/John2206/homie-gnome.git
+cd homie-gnome
+glib-compile-schemas schemas/
+ln -s "$PWD" ~/.local/share/gnome-shell/extensions/homie@jonathan
+```
+
+On Wayland, log out and back in so GNOME Shell detects the extension. Then run:
+
+```bash
+gnome-extensions enable homie@jonathan
+```
+
+To build a zip instead:
+
+```bash
+gnome-extensions pack --extra-source=lib --extra-source=sprites
+```
+
+## Sprite format
+
+The extension reads GIFs directly. No conversion step is needed.
+
+- A directory with `idle.gif`, `click.gif` and `run.gif` is one sprite set.
+- A directory whose subdirectories each hold those three files is a set of color variants. Each dino picks a random variant.
+- The bundled `sprites/dino/` has three variants: `doux` (blue), `mort` (red) and `vita` (green).
+- Sprites should face right. The `run-left` setting mirrors them.
+- A broken or missing GIF logs one `homie:` error line, and the extension skips that variant. With no usable variant, no dino appears.
+
+## Settings
+
+Open the settings with `gnome-extensions prefs homie@jonathan`. Every change applies live.
+
+| Key | Default | Meaning |
+|---|---|---|
+| `sprite-path` | empty | Sprite directory. Empty uses the bundled dinos. |
+| `count` | 3 | Number of dinos (1–10). |
+| `width`, `height` | 0 | Size in px. 0 infers from the other value and the aspect ratio. Both 0 → 3× native size. |
+| `fps` | 7 | Animation frames per second. |
+| `speed` | 15 | Movement steps per second, 10 px each. |
+| `click-chance` | 20 | Percent chance that a click on an idle dino plays the click animation. |
+| `run-left` | false | Run to the left and mirror the sprite. |
+| `hide-in-overview` | true | Hide dinos while the overview is open. |
+
+The "Reload sprites" button reloads the GIFs from disk.
+
+## Implementation notes
+
+- GIF decoding uses `GdkPixbuf.PixbufAnimation`. GdkPixbuf has no frame-list API. `lib/sprites.js` therefore walks the iterator with synthetic timestamps and stops when the frame sequence repeats.
+- On GNOME 50, frames upload with `St.ImageContent.set_bytes(coglContext, bytes, format, w, h, stride)`. This is the same call the shell's own `ui/screenshot.js` uses.
+- `trackFullscreen` makes the layout manager control each actor's `visible` property. Hiding in the overview therefore uses `opacity` and `reactive` instead.
+
+## Known limitations
+
+- Frame timing comes from `fps`. The GIF's own per-frame delays are ignored.
+- Dinos walk on the primary monitor only. On a multi-monitor setup, a dino can show partly on the neighboring monitor while it wraps.
+- Under fractional scaling, nearest-neighbor scaling can make some art pixels one screen pixel wider than others.
+
+## Development
+
+```bash
+gjs -m test/behavior.test.js
+dbus-run-session gnome-shell --devkit     # GNOME 49+, needs the mutter-dev-bin package
+journalctl -f -o cat /usr/bin/gnome-shell
+```

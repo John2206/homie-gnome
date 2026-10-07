@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.homie" path="/org/gnome/shell/extensions/homie/">
+    <key name="sprite-path" type="s">
+      <default>''</default>
+      <summary>Sprite directory</summary>
+      <description>Directory with idle.gif, click.gif and run.gif, or with one such subdirectory per color. Empty uses the bundled dinos.</description>
+    </key>
+    <key name="width" type="i">
+      <range min="0" max="1024"/>
+      <default>0</default>
+      <summary>Width in px (0 = infer)</summary>
+    </key>
+    <key name="height" type="i">
+      <range min="0" max="1024"/>
+      <default>0</default>
+      <summary>Height in px (0 = infer)</summary>
+    </key>
+    <key name="fps" type="i">
+      <range min="1" max="60"/>
+      <default>7</default>
+      <summary>Animation frames per second</summary>
+    </key>
+    <key name="speed" type="i">
+      <range min="1" max="60"/>
+      <default>15</default>
+      <summary>Movement ticks per second (10 px each)</summary>
+    </key>
+    <key name="click-chance" type="i">
+      <range min="0" max="100"/>
+      <default>20</default>
+      <summary>Chance in % that clicking an idle dino plays the click animation</summary>
+    </key>
+    <key name="count" type="i">
+      <range min="1" max="10"/>
+      <default>3</default>
+      <summary>Number of dinos</summary>
+    </key>
+    <key name="run-left" type="b">
+      <default>false</default>
+      <summary>Run to the left (mirrors the sprite)</summary>
+    </key>
+    <key name="hide-in-overview" type="b">
+      <default>true</default>
+      <summary>Hide dinos in the overview</summary>
+    </key>
+    <key name="reload-counter" type="i">
+      <default>0</default>
+      <summary>Bumped by the prefs "Reload sprites" button</summary>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,8 @@
+{
+  "uuid": "homie@jonathan",
+  "name": "Homie",
+  "description": "Animated desktop dinos that run along the bottom of the screen. Rewrite of hannahfluch/homie.",
+  "shell-version": ["50"],
+  "settings-schema": "org.gnome.shell.extensions.homie",
+  "url": "https://github.com/John2206/homie-gnome"
+}
