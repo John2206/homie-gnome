@@ -26,6 +26,7 @@ _homie_spawn() {
     # These settings only shape the next flock; running dinos keep theirs.
     _homie_set whole-screen "$1"
     _homie_set count "$(_homie_rand 25 100)"
+    # Idle/click animation speed; running animation follows each dino's speed.
     _homie_set fps "$(_homie_rand 5 20)"
     _homie_set click-chance "$(_homie_rand 0 100)"
     # Each dino picks its own height (px) and speed (px/s) from these ranges.

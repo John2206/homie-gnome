@@ -60,7 +60,7 @@ export default class HomiePreferences extends ExtensionPreferences {
         spin('count', 'Number of dinos', '', 1, 100);
         spin('size-min', 'Smallest height', 'Pixels; each dino picks a height in this range', 8, 1024);
         spin('size-max', 'Largest height', 'Pixels', 8, 1024);
-        spin('fps', 'Animation FPS', '', 1, 60);
+        spin('fps', 'Idle animation FPS', 'The run animation follows each dino\'s speed', 1, 30);
         spin('speed-min', 'Slowest speed', 'Pixels per second; each dino picks a speed in this range', 1, 5000);
         spin('speed-max', 'Fastest speed', 'Pixels per second', 1, 5000);
         spin('click-chance', 'Click animation chance', 'Percent, when clicking an idle dino', 0, 100);

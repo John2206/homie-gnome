@@ -41,7 +41,7 @@ The original buddy has three states: idle, running and click.
 - A dino keeps its direction. Left-running dinos are mirrored so they face where they run.
 - Besides the three drawn colors, the extension makes six more by shifting the body hue of the first sprite set.
 - Dinos start running right away, without a click.
-- Animation always uses the `fps` setting. The GIF's own frame delays are ignored.
+- The run animation speed follows each dino's movement speed and size, so its feet don't slide: FPS = speed ÷ (0.35 × height), capped at 30. Idle and click animations use the `fps` setting. The GIF's own frame delays are ignored.
 
 ## Install
 
@@ -72,7 +72,7 @@ Add this line to `~/.bashrc`:
 source ~/Desktop/Private/homie/tools/homie.sh
 ```
 
-- `dinos` adds a flock of 25–100 dinos with a random animation speed and click chance. Each dino picks its own height from 24–144 px and its own speed from 20–1000 px/s. Edit `tools/homie.sh` to change these ranges.
+- `dinos` adds a flock of 25–100 dinos with a random idle animation speed and click chance. Each dino picks its own height from 24–144 px and its own speed from 20–1000 px/s. Edit `tools/homie.sh` to change these ranges.
 - `dinosall` does the same, but the dinos run at random heights across the whole screen.
 - Repeated `dinos`/`dinosall` calls add more flocks. Earlier flocks keep running.
 - `nodinos` removes all dinos.
@@ -97,7 +97,7 @@ Open the settings with `gnome-extensions prefs homie@jonathan`.
 | `sprite-path` | empty | Sprite directory. Empty uses the bundled dinos. |
 | `count` | 3 | Number of dinos (1–100). |
 | `size-min`, `size-max` | 24, 144 | Each dino's height is a random value in this range, in px. Width follows the sprite's aspect ratio. |
-| `fps` | 7 | Animation frames per second. |
+| `fps` | 7 | Idle and click animation frames per second (1–30). |
 | `speed-min`, `speed-max` | 20, 1000 | Each dino's speed is a random value in this range, in px per second. |
 | `click-chance` | 20 | Percent chance that a click on an idle dino plays the click animation. |
 | `whole-screen` | false | Run at random heights across the whole screen instead of along the bottom. |
@@ -113,7 +113,7 @@ All settings except `hide-in-overview` apply to the next flock only. A flock is 
 
 ## Known limitations
 
-- Frame timing comes from `fps`. The GIF's own per-frame delays are ignored.
+- The GIF's own per-frame delays are ignored. Animations are capped at 30 FPS.
 - Dinos walk on the primary monitor only. On a multi-monitor setup, a dino can show partly on the neighboring monitor while it wraps.
 - Under fractional scaling, nearest-neighbor scaling can make some art pixels one screen pixel wider than others.
 

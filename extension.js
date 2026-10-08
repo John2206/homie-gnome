@@ -4,12 +4,13 @@ import GLib from 'gi://GLib';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-import {Behavior, randomIn} from './lib/behavior.js';
+import {Behavior, randomIn, runFps} from './lib/behavior.js';
 import {Buddy} from './lib/buddy.js';
 import {loadVariants} from './lib/sprites.js';
 
-// Movement timer rate. Each dino moves speed / MOVE_HZ px per tick.
-const MOVE_HZ = 30;
+// One timer per flock drives movement and animation. Each dino moves
+// speed / TICK_HZ px per tick; animations are capped at TICK_HZ FPS.
+const TICK_HZ = 30;
 
 function shuffle(items) {
     for (let i = items.length - 1; i > 0; i--) {
@@ -130,11 +131,13 @@ export default class HomieExtension extends Extension {
             const height = Math.round(randomIn(p.sizeMin, p.sizeMax, Math.random()));
             const width = Math.round(height * ratio);
             const x = minX + Math.floor(Math.random() * Math.max(area.width - width, 1));
+            const speed = randomIn(p.speedMin, p.speedMax, Math.random());
             const behavior = new Behavior(x, {
                 left: Math.random() < 0.5,
-                stepPx: randomIn(p.speedMin, p.speedMax, Math.random()) / MOVE_HZ,
+                stepPx: speed / TICK_HZ,
             });
-            const buddy = new Buddy(variant, width, height, behavior, p.clickChance);
+            const buddy = new Buddy(variant, width, height, behavior, p.clickChance,
+                Math.min(p.fps, TICK_HZ), runFps(speed, height, TICK_HZ));
             // Along the bottom of the work area, or at a random fixed height.
             const y = p.wholeScreen
                 ? area.y + Math.floor(Math.random() * Math.max(area.height - height, 1))
@@ -146,13 +149,10 @@ export default class HomieExtension extends Extension {
         this._setHidden(Main.overview.visible && this._settings.get_boolean('hide-in-overview'),
             flock.buddies);
 
-        const timer = (ms, fn) => flock.sources.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT,
-            Math.round(ms), () => {
-                flock.buddies.forEach(fn);
-                return GLib.SOURCE_CONTINUE;
-            }));
-        timer(1000 / p.fps, b => b.animate());
-        timer(1000 / MOVE_HZ, b => b.move(minX, maxX));
+        flock.sources.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT, Math.round(1000 / TICK_HZ), () => {
+            flock.buddies.forEach(b => b.tick(TICK_HZ, minX, maxX));
+            return GLib.SOURCE_CONTINUE;
+        }));
     }
 
     // Uses opacity, not `visible`: trackFullscreen makes the layout manager

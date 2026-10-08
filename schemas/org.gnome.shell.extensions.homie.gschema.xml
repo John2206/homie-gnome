@@ -17,9 +17,9 @@
       <summary>Largest dino height in px</summary>
     </key>
     <key name="fps" type="i">
-      <range min="1" max="60"/>
+      <range min="1" max="30"/>
       <default>7</default>
-      <summary>Animation frames per second</summary>
+      <summary>Idle and click animation frames per second (running follows speed)</summary>
     </key>
     <key name="speed-min" type="i">
       <range min="1" max="5000"/>

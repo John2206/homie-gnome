@@ -1,5 +1,5 @@
 // Run with: gjs -m test/behavior.test.js
-import {Behavior, State, randomIn} from '../lib/behavior.js';
+import {Behavior, State, randomIn, runFps} from '../lib/behavior.js';
 
 const STEP_PX = 10; // Behavior's default step
 
@@ -46,5 +46,16 @@ assert(l.left && !l.step(0, 100, 20) && l.x === 93, 'keeps direction and own ste
 assert(randomIn(24, 144, 0) === 24 && randomIn(24, 144, 1) === 144, 'range ends');
 assert(randomIn(24, 144, 0.5) === 84, 'range middle');
 assert(randomIn(144, 24, 0) === 24, 'swapped range');
+
+// Run FPS follows speed and size: the original's dino example gives ~7.
+assert(Math.abs(runFps(150, 60, 30) - 150 / 21) < 1e-9, 'run fps from speed and height');
+assert(runFps(2000, 24, 30) === 30 && runFps(1, 144, 30) === 1, 'run fps clamped');
+
+// animate() advances at fps/hz per tick and carries the fraction over.
+const a = new Behavior(0);
+let steps = 0;
+for (let i = 0; i < 30; i++)
+    steps += a.animate(7, 30, 100) ? 1 : 0;
+assert(steps === 7 && a.frame === 7, '7 fps on a 30 Hz timer = 7 frames per second');
 
 print('behavior: all checks passed');
