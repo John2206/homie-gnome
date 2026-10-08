@@ -64,6 +64,17 @@ To build a zip instead:
 gnome-extensions pack --extra-source=lib --extra-source=sprites
 ```
 
+## Shell commands
+
+Add this line to `~/.bashrc`:
+
+```bash
+source ~/Desktop/Private/homie/tools/homie.sh
+```
+
+- `dinos` spawns a fresh set of dinos with random settings: 1–10 dinos, random animation speed, movement speed, click chance and base size.
+- `nodinos` removes all dinos.
+
 ## Sprite format
 
 The extension reads GIFs directly. No conversion step is needed.
