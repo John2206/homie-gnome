@@ -16,78 +16,109 @@ function shuffle(items) {
     return items;
 }
 
+// A flock is one batch of dinos spawned with one set of settings. Flocks run
+// side by side; each has its own timers.
 export default class HomieExtension extends Extension {
     enable() {
         this._settings = this.getSettings();
-        this._buddies = [];
-        this._sources = [];
-        this._settings.connectObject('changed', () => this._reload(), this);
-        Main.layoutManager.connectObject('monitors-changed', () => this._reload(), this);
+        this._flocks = [];
+        this._cancellable = new Gio.Cancellable();
+        // Settings only shape the next flock. Bumping spawn-counter (the
+        // dinos/dinosall shell functions, or the prefs button) adds one.
+        this._settings.connectObject('changed::spawn-counter',
+            () => this._addFlock(this._readParams()), this);
+        Main.layoutManager.connectObject('monitors-changed', () => this._rebuild(), this);
         Main.overview.connectObject(
             'showing', () => this._setHidden(this._settings.get_boolean('hide-in-overview')),
             'hidden', () => this._setHidden(false), this);
-        this._reload();
+        this._addFlock(this._readParams());
     }
 
     disable() {
-        this._clear();
+        this._cancellable.cancel();
+        this._flocks.forEach(f => this._destroyFlock(f));
         this._settings.disconnectObject(this);
         Main.layoutManager.disconnectObject(this);
         Main.overview.disconnectObject(this);
         this._settings = null;
-        this._buddies = null;
-        this._sources = null;
-    }
-
-    // Destroys dinos, stops timers and cancels any load in flight.
-    _clear() {
-        this._cancellable?.cancel();
+        this._flocks = null;
         this._cancellable = null;
-        this._sources.forEach(id => GLib.source_remove(id));
-        this._sources = [];
-        this._buddies.forEach(b => b.destroy());
-        this._buddies = [];
     }
 
-    // Any setting or monitor change rebuilds everything from scratch.
-    async _reload() {
-        this._clear();
-        const cancellable = new Gio.Cancellable();
-        this._cancellable = cancellable;
-        const path = this._settings.get_string('sprite-path') ||
-            this.dir.get_child('sprites').get_child('dino').get_path();
+    _readParams() {
+        const s = this._settings;
+        return {
+            path: s.get_string('sprite-path') ||
+                this.dir.get_child('sprites').get_child('dino').get_path(),
+            width: s.get_int('width'),
+            height: s.get_int('height'),
+            count: s.get_int('count'),
+            fps: s.get_int('fps'),
+            speed: s.get_int('speed'),
+            clickChance: s.get_int('click-chance'),
+            wholeScreen: s.get_boolean('whole-screen'),
+        };
+    }
+
+    async _addFlock(params) {
+        const flock = {params, buddies: [], sources: [], dead: false};
+        this._flocks.push(flock);
+        const cancellable = this._cancellable;
 
         let variants;
         try {
-            variants = await loadVariants(path, cancellable);
+            // ponytail: each flock decodes its own frames; share a cache if
+            // spawning many flocks gets slow.
+            variants = await loadVariants(params.path, cancellable);
         } catch (e) {
             if (!cancellable.is_cancelled())
-                console.error(`homie: cannot load sprites from ${path}: ${e.message}`);
+                console.error(`homie: cannot load sprites from ${params.path}: ${e.message}`);
             return;
         }
-        // A newer reload or disable() ran while we were loading.
-        if (cancellable.is_cancelled())
+        // disable() or a monitor rebuild ran while we were loading.
+        if (cancellable.is_cancelled() || flock.dead)
             return;
         if (variants.length === 0) {
-            console.error(`homie: no usable sprites in ${path}`);
+            console.error(`homie: no usable sprites in ${params.path}`);
             return;
         }
-        this._spawn(variants);
+        this._spawn(flock, variants);
     }
 
-    _spawn(variants) {
-        const s = this._settings;
+    // Stops a flock's timers and destroys its dinos.
+    _destroyFlock(flock) {
+        flock.dead = true;
+        flock.sources.forEach(id => GLib.source_remove(id));
+        flock.buddies.forEach(b => b.destroy());
+        flock.sources = [];
+        flock.buddies = [];
+    }
+
+    // Monitor change: respawn every flock with its own settings on the new layout.
+    _rebuild() {
+        const all = this._flocks.map(f => f.params);
+        this._flocks.forEach(f => this._destroyFlock(f));
+        this._flocks = [];
+        all.forEach(p => this._addFlock(p));
+    }
+
+    _spawn(flock, variants) {
+        // At shell startup the extension can be enabled before any monitor
+        // exists. The flock keeps its params; monitors-changed respawns it.
+        if (!Main.layoutManager.primaryMonitor)
+            return;
+        const p = flock.params;
         const native = variants[0].idle;
-        const base = spriteSize(native, s.get_int('width'), s.get_int('height'));
+        const base = spriteSize(native, p.width, p.height);
         const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
         const minX = area.x;
         const maxX = area.x + area.width;
 
         // Each dino gets a random color, size, direction, speed and (with
-        // whole-screen) height on screen, all fixed until the next reload. Colors come from a shuffled
-        // deck, so every color appears once before any repeats.
+        // whole-screen) height on screen. Colors come from a shuffled deck, so
+        // every color appears once before any repeats.
         const deck = [];
-        for (let i = 0; i < s.get_int('count'); i++) {
+        for (let i = 0; i < p.count; i++) {
             if (deck.length === 0)
                 deck.push(...shuffle([...variants]));
             const variant = deck.pop();
@@ -97,33 +128,31 @@ export default class HomieExtension extends Extension {
                 left: Math.random() < 0.5,
                 stepPx: randomStep(Math.random()),
             });
-            const buddy = new Buddy(variant, width, height, behavior, s.get_int('click-chance'));
+            const buddy = new Buddy(variant, width, height, behavior, p.clickChance);
             // Along the bottom of the work area, or at a random fixed height.
-            const bottom = area.y + area.height - height;
-            const y = s.get_boolean('whole-screen')
+            const y = p.wholeScreen
                 ? area.y + Math.floor(Math.random() * Math.max(area.height - height, 1))
-                : bottom;
+                : area.y + area.height - height;
             buddy.set_position(x, y);
             Main.layoutManager.addTopChrome(buddy, {trackFullscreen: true});
-            this._buddies.push(buddy);
+            flock.buddies.push(buddy);
         }
-        this._setHidden(Main.overview.visible && s.get_boolean('hide-in-overview'));
+        this._setHidden(Main.overview.visible && this._settings.get_boolean('hide-in-overview'),
+            flock.buddies);
 
-        this._addTimer(1000 / s.get_int('fps'), b => b.animate());
-        this._addTimer(1000 / s.get_int('speed'), b => b.move(minX, maxX));
-    }
-
-    _addTimer(ms, fn) {
-        this._sources.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT, Math.round(ms), () => {
-            this._buddies.forEach(fn);
-            return GLib.SOURCE_CONTINUE;
-        }));
+        const timer = (ms, fn) => flock.sources.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT,
+            Math.round(ms), () => {
+                flock.buddies.forEach(fn);
+                return GLib.SOURCE_CONTINUE;
+            }));
+        timer(1000 / p.fps, b => b.animate());
+        timer(1000 / p.speed, b => b.move(minX, maxX));
     }
 
     // Uses opacity, not `visible`: trackFullscreen makes the layout manager
     // own `visible`, and it sets it back to true when the overview opens.
-    _setHidden(hidden) {
-        for (const b of this._buddies) {
+    _setHidden(hidden, buddies = this._flocks.flatMap(f => f.buddies)) {
+        for (const b of buddies) {
             b.opacity = hidden ? 0 : 255;
             b.reactive = !hidden;
         }

@@ -44,9 +44,9 @@
       <default>true</default>
       <summary>Hide dinos in the overview</summary>
     </key>
-    <key name="reload-counter" type="i">
+    <key name="spawn-counter" type="i">
       <default>0</default>
-      <summary>Bumped by the prefs "Reload sprites" button</summary>
+      <summary>Each change spawns one more flock with the current settings</summary>
     </key>
   </schema>
 </schemalist>

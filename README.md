@@ -37,7 +37,7 @@ The original buddy has three states: idle, running and click.
 ## How this extension differs
 
 - Several dinos run at once (setting `count`, default 3).
-- Each dino spawns with a random color, size, direction and speed. With `whole-screen` on, it also gets a random height on screen. They stay fixed until the next reload. Colors are dealt from a shuffled deck, so every color appears once before any repeats.
+- Each dino spawns with a random color, size, direction and speed. With `whole-screen` on, it also gets a random height on screen. They stay fixed for the dino's lifetime. Colors are dealt from a shuffled deck, so every color appears once before any repeats.
 - A dino keeps its direction. Left-running dinos are mirrored so they face where they run.
 - Besides the three drawn colors, the extension makes six more by shifting the body hue of the first sprite set.
 - Dinos start running right away, without a click.
@@ -72,8 +72,9 @@ Add this line to `~/.bashrc`:
 source ~/Desktop/Private/homie/tools/homie.sh
 ```
 
-- `dinos` spawns a fresh set of dinos with random settings: 25–100 dinos, random animation speed, movement speed, click chance and base size.
+- `dinos` adds a flock of dinos with random settings: 25–100 dinos, random animation speed, movement speed, click chance and base size.
 - `dinosall` does the same, but the dinos run at random heights across the whole screen.
+- Repeated `dinos`/`dinosall` calls add more flocks. Earlier flocks keep running.
 - `nodinos` removes all dinos.
 
 ## Sprite format
@@ -89,7 +90,7 @@ The extension reads GIFs directly. No conversion step is needed.
 
 ## Settings
 
-Open the settings with `gnome-extensions prefs homie@jonathan`. Every change applies live.
+Open the settings with `gnome-extensions prefs homie@jonathan`.
 
 | Key | Default | Meaning |
 |---|---|---|
@@ -102,7 +103,7 @@ Open the settings with `gnome-extensions prefs homie@jonathan`. Every change app
 | `whole-screen` | false | Run at random heights across the whole screen instead of along the bottom. |
 | `hide-in-overview` | true | Hide dinos while the overview is open. |
 
-The "Reload sprites" button reloads the GIFs from disk.
+All settings except `hide-in-overview` apply to the next flock only. A flock is one batch of dinos. Dinos already running keep their settings. The "Spawn dinos" button in prefs adds a flock with the current settings. Enabling the extension spawns one flock.
 
 ## Implementation notes
 

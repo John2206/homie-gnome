@@ -42,12 +42,14 @@ export default class HomiePreferences extends ExtensionPreferences {
         pathRow.add_suffix(reset);
         sprites.add(pathRow);
 
-        const reload = new Adw.ButtonRow({title: 'Reload sprites'});
-        reload.connect('activated', () =>
-            settings.set_int('reload-counter', settings.get_int('reload-counter') + 1));
-        sprites.add(reload);
+        const hide = new Adw.SwitchRow({title: 'Hide in overview'});
+        settings.bind('hide-in-overview', hide, 'active', Gio.SettingsBindFlags.DEFAULT);
+        sprites.add(hide);
 
-        const look = new Adw.PreferencesGroup({title: 'Behavior'});
+        const look = new Adw.PreferencesGroup({
+            title: 'Next flock',
+            description: 'These settings apply to dinos spawned from now on. Dinos already running keep theirs.',
+        });
         page.add(look);
         const spin = (key, title, subtitle, lower, upper) => {
             const row = Adw.SpinRow.new_with_range(lower, upper, 1);
@@ -68,6 +70,10 @@ export default class HomiePreferences extends ExtensionPreferences {
             look.add(row);
         };
         toggle('whole-screen', 'Use the whole screen');
-        toggle('hide-in-overview', 'Hide in overview');
+
+        const spawn = new Adw.ButtonRow({title: 'Spawn dinos'});
+        spawn.connect('activated', () =>
+            settings.set_int('spawn-counter', settings.get_int('spawn-counter') + 1));
+        look.add(spawn);
     }
 }
