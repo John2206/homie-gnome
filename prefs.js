@@ -67,6 +67,7 @@ export default class HomiePreferences extends ExtensionPreferences {
             settings.bind(key, row, 'active', Gio.SettingsBindFlags.DEFAULT);
             look.add(row);
         };
+        toggle('whole-screen', 'Use the whole screen');
         toggle('hide-in-overview', 'Hide in overview');
     }
 }

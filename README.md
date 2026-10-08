@@ -1,6 +1,6 @@
 # Homie for GNOME
 
-Animated desktop dinos that run across your screen, each at its own height.
+Animated desktop dinos that run along the bottom of your screen, or across all of it.
 This is a GNOME Shell extension rewrite of [Homie](https://github.com/hannahfluch/homie) by Hannah Fluch.
 The original is a Rust/GTK4 app that needs `wlr-layer-shell`, which GNOME's Mutter does not implement.
 This extension runs inside the shell instead, so it works on stock Ubuntu with Wayland.
@@ -37,7 +37,7 @@ The original buddy has three states: idle, running and click.
 ## How this extension differs
 
 - Several dinos run at once (setting `count`, default 3).
-- Each dino spawns with a random color, size, direction, speed and height on screen. They stay fixed until the next reload. Colors are dealt from a shuffled deck, so every color appears once before any repeats.
+- Each dino spawns with a random color, size, direction and speed. With `whole-screen` on, it also gets a random height on screen. They stay fixed until the next reload. Colors are dealt from a shuffled deck, so every color appears once before any repeats.
 - A dino keeps its direction. Left-running dinos are mirrored so they face where they run.
 - Besides the three drawn colors, the extension makes six more by shifting the body hue of the first sprite set.
 - Dinos start running right away, without a click.
@@ -73,6 +73,7 @@ source ~/Desktop/Private/homie/tools/homie.sh
 ```
 
 - `dinos` spawns a fresh set of dinos with random settings: 25–100 dinos, random animation speed, movement speed, click chance and base size.
+- `dinosall` does the same, but the dinos run at random heights across the whole screen.
 - `nodinos` removes all dinos.
 
 ## Sprite format
@@ -98,6 +99,7 @@ Open the settings with `gnome-extensions prefs homie@jonathan`. Every change app
 | `fps` | 7 | Animation frames per second. |
 | `speed` | 15 | Movement steps per second. Each dino moves a random 5–15 px per step. |
 | `click-chance` | 20 | Percent chance that a click on an idle dino plays the click animation. |
+| `whole-screen` | false | Run at random heights across the whole screen instead of along the bottom. |
 | `hide-in-overview` | true | Hide dinos while the overview is open. |
 
 The "Reload sprites" button reloads the GIFs from disk.

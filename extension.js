@@ -83,8 +83,8 @@ export default class HomieExtension extends Extension {
         const minX = area.x;
         const maxX = area.x + area.width;
 
-        // Each dino gets a random color, size, direction, speed and height on
-        // screen, all fixed until the next reload. Colors come from a shuffled
+        // Each dino gets a random color, size, direction, speed and (with
+        // whole-screen) height on screen, all fixed until the next reload. Colors come from a shuffled
         // deck, so every color appears once before any repeats.
         const deck = [];
         for (let i = 0; i < s.get_int('count'); i++) {
@@ -98,8 +98,11 @@ export default class HomieExtension extends Extension {
                 stepPx: randomStep(Math.random()),
             });
             const buddy = new Buddy(variant, width, height, behavior, s.get_int('click-chance'));
-            // A random fixed height on screen, anywhere inside the work area.
-            const y = area.y + Math.floor(Math.random() * Math.max(area.height - height, 1));
+            // Along the bottom of the work area, or at a random fixed height.
+            const bottom = area.y + area.height - height;
+            const y = s.get_boolean('whole-screen')
+                ? area.y + Math.floor(Math.random() * Math.max(area.height - height, 1))
+                : bottom;
             buddy.set_position(x, y);
             Main.layoutManager.addTopChrome(buddy, {trackFullscreen: true});
             this._buddies.push(buddy);

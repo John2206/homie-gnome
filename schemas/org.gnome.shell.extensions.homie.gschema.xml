@@ -36,6 +36,10 @@
       <default>3</default>
       <summary>Number of dinos</summary>
     </key>
+    <key name="whole-screen" type="b">
+      <default>false</default>
+      <summary>Run at random heights across the whole screen instead of along the bottom</summary>
+    </key>
     <key name="hide-in-overview" type="b">
       <default>true</default>
       <summary>Hide dinos in the overview</summary>
