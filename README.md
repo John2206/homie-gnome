@@ -1,6 +1,6 @@
 # Homie for GNOME
 
-Animated desktop dinos that run along the bottom of your screen.
+Animated desktop dinos that run across your screen, each at its own height.
 This is a GNOME Shell extension rewrite of [Homie](https://github.com/hannahfluch/homie) by Hannah Fluch.
 The original is a Rust/GTK4 app that needs `wlr-layer-shell`, which GNOME's Mutter does not implement.
 This extension runs inside the shell instead, so it works on stock Ubuntu with Wayland.
@@ -37,7 +37,7 @@ The original buddy has three states: idle, running and click.
 ## How this extension differs
 
 - Several dinos run at once (setting `count`, default 3).
-- Each dino spawns with a random color, size, direction and speed. They stay fixed until the next reload. Colors are dealt from a shuffled deck, so every color appears once before any repeats.
+- Each dino spawns with a random color, size, direction, speed and height on screen. They stay fixed until the next reload. Colors are dealt from a shuffled deck, so every color appears once before any repeats.
 - A dino keeps its direction. Left-running dinos are mirrored so they face where they run.
 - Besides the three drawn colors, the extension makes six more by shifting the body hue of the first sprite set.
 - Dinos start running right away, without a click.
