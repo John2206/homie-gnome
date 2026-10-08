@@ -4,8 +4,17 @@ import GLib from 'gi://GLib';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
+import {Behavior, randomStep} from './lib/behavior.js';
 import {Buddy} from './lib/buddy.js';
-import {loadVariants, spriteSize} from './lib/sprites.js';
+import {loadVariants, randomSize, spriteSize} from './lib/sprites.js';
+
+function shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+    }
+    return items;
+}
 
 export default class HomieExtension extends Extension {
     enable() {
@@ -68,16 +77,27 @@ export default class HomieExtension extends Extension {
 
     _spawn(variants) {
         const s = this._settings;
-        const [width, height] = spriteSize(variants[0].idle,
-            s.get_int('width'), s.get_int('height'));
+        const native = variants[0].idle;
+        const base = spriteSize(native, s.get_int('width'), s.get_int('height'));
         const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
         const minX = area.x;
         const maxX = area.x + area.width;
-        const opts = {left: s.get_boolean('run-left'), clickChance: s.get_int('click-chance')};
 
+        // Each dino gets a random color, size, direction and speed, all fixed
+        // until the next reload. Colors come from a shuffled deck, so every
+        // color appears once before any repeats.
+        const deck = [];
         for (let i = 0; i < s.get_int('count'); i++) {
+            if (deck.length === 0)
+                deck.push(...shuffle([...variants]));
+            const variant = deck.pop();
+            const [width, height] = randomSize(native, base, Math.random());
             const x = minX + Math.floor(Math.random() * Math.max(area.width - width, 1));
-            const buddy = new Buddy(variants, width, height, x, opts);
+            const behavior = new Behavior(x, {
+                left: Math.random() < 0.5,
+                stepPx: randomStep(Math.random()),
+            });
+            const buddy = new Buddy(variant, width, height, behavior, s.get_int('click-chance'));
             buddy.set_position(x, area.y + area.height - height);
             Main.layoutManager.addTopChrome(buddy, {trackFullscreen: true});
             this._buddies.push(buddy);

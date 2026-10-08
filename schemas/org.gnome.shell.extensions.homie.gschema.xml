@@ -36,10 +36,6 @@
       <default>3</default>
       <summary>Number of dinos</summary>
     </key>
-    <key name="run-left" type="b">
-      <default>false</default>
-      <summary>Run to the left (mirrors the sprite)</summary>
-    </key>
     <key name="hide-in-overview" type="b">
       <default>true</default>
       <summary>Hide dinos in the overview</summary>

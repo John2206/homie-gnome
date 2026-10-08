@@ -37,9 +37,10 @@ The original buddy has three states: idle, running and click.
 ## How this extension differs
 
 - Several dinos run at once (setting `count`, default 3).
-- Every dino picks a random color when it spawns and again each time it wraps around the screen.
+- Each dino spawns with a random color, size, direction and speed. They stay fixed until the next reload. Colors are dealt from a shuffled deck, so every color appears once before any repeats.
+- A dino keeps its direction. Left-running dinos are mirrored so they face where they run.
+- Besides the three drawn colors, the extension makes six more by shifting the body hue of the first sprite set.
 - Dinos start running right away, without a click.
-- The `run-left` setting also mirrors the sprite, so the dino faces where it runs.
 - Animation always uses the `fps` setting. The GIF's own frame delays are ignored.
 
 ## Install
@@ -70,7 +71,8 @@ The extension reads GIFs directly. No conversion step is needed.
 - A directory with `idle.gif`, `click.gif` and `run.gif` is one sprite set.
 - A directory whose subdirectories each hold those three files is a set of color variants. Each dino picks a random variant.
 - The bundled `sprites/dino/` has three variants: `doux` (blue), `mort` (red) and `vita` (green).
-- Sprites should face right. The `run-left` setting mirrors them.
+- Sprites should face right. Dinos running left are mirrored.
+- The extension adds six recolored copies of the first variant (gold, green, teal, purple, magenta, pink). It shifts only pixels near the sprite's most common hue, so outlines, whites and differently colored accents stay as drawn. A grayscale sprite gets no copies.
 - A broken or missing GIF logs one `homie:` error line, and the extension skips that variant. With no usable variant, no dino appears.
 
 ## Settings
@@ -81,11 +83,10 @@ Open the settings with `gnome-extensions prefs homie@jonathan`. Every change app
 |---|---|---|
 | `sprite-path` | empty | Sprite directory. Empty uses the bundled dinos. |
 | `count` | 3 | Number of dinos (1–10). |
-| `width`, `height` | 0 | Size in px. 0 infers from the other value and the aspect ratio. Both 0 → 3× native size. |
+| `width`, `height` | 0 | Base size in px. 0 infers from the other value and the aspect ratio. Both 0 → 3× native size. Each dino is a random whole multiple of the native size between 0.5× and 1.5× of the base. |
 | `fps` | 7 | Animation frames per second. |
-| `speed` | 15 | Movement steps per second, 10 px each. |
+| `speed` | 15 | Movement steps per second. Each dino moves a random 5–15 px per step. |
 | `click-chance` | 20 | Percent chance that a click on an idle dino plays the click animation. |
-| `run-left` | false | Run to the left and mirror the sprite. |
 | `hide-in-overview` | true | Hide dinos while the overview is open. |
 
 The "Reload sprites" button reloads the GIFs from disk.

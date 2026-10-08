@@ -56,10 +56,10 @@ export default class HomiePreferences extends ExtensionPreferences {
             look.add(row);
         };
         spin('count', 'Number of dinos', '', 1, 10);
-        spin('width', 'Width', 'Pixels; 0 infers from height', 0, 1024);
-        spin('height', 'Height', 'Pixels; 0 infers from width', 0, 1024);
+        spin('width', 'Base width', 'Pixels; 0 infers from height; dinos vary 0.5–1.5×', 0, 1024);
+        spin('height', 'Base height', 'Pixels; 0 infers from width; dinos vary 0.5–1.5×', 0, 1024);
         spin('fps', 'Animation FPS', '', 1, 60);
-        spin('speed', 'Speed', 'Steps of 10 px per second', 1, 60);
+        spin('speed', 'Speed', 'Steps per second; each dino moves 5–15 px per step', 1, 60);
         spin('click-chance', 'Click animation chance', 'Percent, when clicking an idle dino', 0, 100);
 
         const toggle = (key, title) => {
@@ -67,7 +67,6 @@ export default class HomiePreferences extends ExtensionPreferences {
             settings.bind(key, row, 'active', Gio.SettingsBindFlags.DEFAULT);
             look.add(row);
         };
-        toggle('run-left', 'Run to the left');
         toggle('hide-in-overview', 'Hide in overview');
     }
 }
