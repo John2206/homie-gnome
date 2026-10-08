@@ -96,7 +96,7 @@ Open the settings with `gnome-extensions prefs homie@jonathan`.
 |---|---|---|
 | `sprite-path` | empty | Sprite directory. Empty uses the bundled dinos. |
 | `count` | 3 | Number of dinos (1–100). |
-| `width`, `height` | 0 | Base size in px. 0 infers from the other value and the aspect ratio. Both 0 → 3× native size. Each dino is a random whole multiple of the native size between 0.5× and 1.5× of the base. |
+| `width`, `height` | 0 | Base size in px. 0 infers from the other value and the aspect ratio. Both 0 → 3× native size. Each dino gets a random size anywhere between 0.5× and 1.5× of the base, but never smaller than the native sprite. |
 | `fps` | 7 | Animation frames per second. |
 | `speed` | 15 | Movement steps per second. Each dino moves a random 5–15 px per step. |
 | `click-chance` | 20 | Percent chance that a click on an idle dino plays the click animation. |
