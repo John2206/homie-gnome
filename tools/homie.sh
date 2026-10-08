@@ -20,13 +20,13 @@ _homie_rand() {
 dinos() {
     # Disable first so the new settings apply in one rebuild, not one per key.
     gnome-extensions disable "$HOMIE_UUID" 2>/dev/null
-    _homie_set count "$(_homie_rand 1 10)"
-    _homie_set fps "$(_homie_rand 5 12)"
-    _homie_set speed "$(_homie_rand 10 30)"
+    _homie_set count "$(_homie_rand 25 100)"
+    _homie_set fps "$(_homie_rand 5 20)"
+    _homie_set speed "$(_homie_rand 10 50)"
     _homie_set click-chance "$(_homie_rand 0 100)"
     # Base height in multiples of the 24 px sprite; each dino varies around it.
     _homie_set width 0
-    _homie_set height "$(( 24 * $(_homie_rand 2 4) ))"
+    _homie_set height "$(( 24 * $(_homie_rand 1 6) ))"
     gnome-extensions enable "$HOMIE_UUID"
 }
 

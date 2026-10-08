@@ -55,7 +55,7 @@ export default class HomiePreferences extends ExtensionPreferences {
             settings.bind(key, row, 'value', Gio.SettingsBindFlags.DEFAULT);
             look.add(row);
         };
-        spin('count', 'Number of dinos', '', 1, 10);
+        spin('count', 'Number of dinos', '', 1, 100);
         spin('width', 'Base width', 'Pixels; 0 infers from height; dinos vary 0.5–1.5×', 0, 1024);
         spin('height', 'Base height', 'Pixels; 0 infers from width; dinos vary 0.5–1.5×', 0, 1024);
         spin('fps', 'Animation FPS', '', 1, 60);

@@ -32,7 +32,7 @@
       <summary>Chance in % that clicking an idle dino plays the click animation</summary>
     </key>
     <key name="count" type="i">
-      <range min="1" max="10"/>
+      <range min="1" max="100"/>
       <default>3</default>
       <summary>Number of dinos</summary>
     </key>
