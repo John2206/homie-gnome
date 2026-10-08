@@ -27,11 +27,12 @@ _homie_spawn() {
     _homie_set whole-screen "$1"
     _homie_set count "$(_homie_rand 25 100)"
     _homie_set fps "$(_homie_rand 5 20)"
-    _homie_set speed "$(_homie_rand 10 50)"
     _homie_set click-chance "$(_homie_rand 0 100)"
-    # Base height in px; each dino varies 0.5–1.5× around it (min 24 px).
-    _homie_set width 0
-    _homie_set height "$(_homie_rand 24 144)"
+    # Each dino picks its own height (px) and speed (px/s) from these ranges.
+    _homie_set size-min 24
+    _homie_set size-max 144
+    _homie_set speed-min 20
+    _homie_set speed-max 1000
     if gnome-extensions info "$HOMIE_UUID" | grep -q 'State: ACTIVE'; then
         # Running: each change of spawn-counter adds one flock.
         local n

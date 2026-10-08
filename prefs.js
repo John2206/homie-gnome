@@ -58,10 +58,11 @@ export default class HomiePreferences extends ExtensionPreferences {
             look.add(row);
         };
         spin('count', 'Number of dinos', '', 1, 100);
-        spin('width', 'Base width', 'Pixels; 0 infers from height; dinos vary 0.5–1.5×', 0, 1024);
-        spin('height', 'Base height', 'Pixels; 0 infers from width; dinos vary 0.5–1.5×', 0, 1024);
+        spin('size-min', 'Smallest height', 'Pixels; each dino picks a height in this range', 8, 1024);
+        spin('size-max', 'Largest height', 'Pixels', 8, 1024);
         spin('fps', 'Animation FPS', '', 1, 60);
-        spin('speed', 'Speed', 'Steps per second; each dino moves 5–15 px per step', 1, 60);
+        spin('speed-min', 'Slowest speed', 'Pixels per second; each dino picks a speed in this range', 1, 5000);
+        spin('speed-max', 'Fastest speed', 'Pixels per second', 1, 5000);
         spin('click-chance', 'Click animation chance', 'Percent, when clicking an idle dino', 0, 100);
 
         const toggle = (key, title) => {

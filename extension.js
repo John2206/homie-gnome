@@ -4,9 +4,12 @@ import GLib from 'gi://GLib';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-import {Behavior, randomStep} from './lib/behavior.js';
+import {Behavior, randomIn} from './lib/behavior.js';
 import {Buddy} from './lib/buddy.js';
-import {loadVariants, randomSize, spriteSize} from './lib/sprites.js';
+import {loadVariants} from './lib/sprites.js';
+
+// Movement timer rate. Each dino moves speed / MOVE_HZ px per tick.
+const MOVE_HZ = 30;
 
 function shuffle(items) {
     for (let i = items.length - 1; i > 0; i--) {
@@ -50,11 +53,12 @@ export default class HomieExtension extends Extension {
         return {
             path: s.get_string('sprite-path') ||
                 this.dir.get_child('sprites').get_child('dino').get_path(),
-            width: s.get_int('width'),
-            height: s.get_int('height'),
+            sizeMin: s.get_int('size-min'),
+            sizeMax: s.get_int('size-max'),
             count: s.get_int('count'),
             fps: s.get_int('fps'),
-            speed: s.get_int('speed'),
+            speedMin: s.get_int('speed-min'),
+            speedMax: s.get_int('speed-max'),
             clickChance: s.get_int('click-chance'),
             wholeScreen: s.get_boolean('whole-screen'),
         };
@@ -109,7 +113,7 @@ export default class HomieExtension extends Extension {
             return;
         const p = flock.params;
         const native = variants[0].idle;
-        const base = spriteSize(native, p.width, p.height);
+        const ratio = native.width / native.height;
         const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
         const minX = area.x;
         const maxX = area.x + area.width;
@@ -122,11 +126,13 @@ export default class HomieExtension extends Extension {
             if (deck.length === 0)
                 deck.push(...shuffle([...variants]));
             const variant = deck.pop();
-            const [width, height] = randomSize(native, base, Math.random());
+            // Height and speed: any value in the configured ranges.
+            const height = Math.round(randomIn(p.sizeMin, p.sizeMax, Math.random()));
+            const width = Math.round(height * ratio);
             const x = minX + Math.floor(Math.random() * Math.max(area.width - width, 1));
             const behavior = new Behavior(x, {
                 left: Math.random() < 0.5,
-                stepPx: randomStep(Math.random()),
+                stepPx: randomIn(p.speedMin, p.speedMax, Math.random()) / MOVE_HZ,
             });
             const buddy = new Buddy(variant, width, height, behavior, p.clickChance);
             // Along the bottom of the work area, or at a random fixed height.
@@ -146,7 +152,7 @@ export default class HomieExtension extends Extension {
                 return GLib.SOURCE_CONTINUE;
             }));
         timer(1000 / p.fps, b => b.animate());
-        timer(1000 / p.speed, b => b.move(minX, maxX));
+        timer(1000 / MOVE_HZ, b => b.move(minX, maxX));
     }
 
     // Uses opacity, not `visible`: trackFullscreen makes the layout manager

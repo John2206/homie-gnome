@@ -1,5 +1,7 @@
 // Run with: gjs -m test/behavior.test.js
-import {Behavior, State, STEP_PX, randomStep} from '../lib/behavior.js';
+import {Behavior, State, randomIn} from '../lib/behavior.js';
+
+const STEP_PX = 10; // Behavior's default step
 
 function assert(cond, msg) {
     if (!cond)
@@ -40,7 +42,9 @@ assert(l.step(0, 100, 20), 'wraps at left edge');
 assert(l.x === 100, 'left wrap re-enters at maxX');
 assert(l.left && !l.step(0, 100, 20) && l.x === 93, 'keeps direction and own step after wrap');
 
-// Individual speeds stay within 0.5x..1.5x of the original step.
-assert(randomStep(0) === 5 && randomStep(0.999) === 15, 'random step range');
+// Random sizes and speeds cover the whole range, in either order.
+assert(randomIn(24, 144, 0) === 24 && randomIn(24, 144, 1) === 144, 'range ends');
+assert(randomIn(24, 144, 0.5) === 84, 'range middle');
+assert(randomIn(144, 24, 0) === 24, 'swapped range');
 
 print('behavior: all checks passed');

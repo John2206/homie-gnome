@@ -72,7 +72,7 @@ Add this line to `~/.bashrc`:
 source ~/Desktop/Private/homie/tools/homie.sh
 ```
 
-- `dinos` adds a flock of dinos with random settings: 25–100 dinos, random animation speed, movement speed, click chance and base size.
+- `dinos` adds a flock of 25–100 dinos with a random animation speed and click chance. Each dino picks its own height from 24–144 px and its own speed from 20–1000 px/s. Edit `tools/homie.sh` to change these ranges.
 - `dinosall` does the same, but the dinos run at random heights across the whole screen.
 - Repeated `dinos`/`dinosall` calls add more flocks. Earlier flocks keep running.
 - `nodinos` removes all dinos.
@@ -96,9 +96,9 @@ Open the settings with `gnome-extensions prefs homie@jonathan`.
 |---|---|---|
 | `sprite-path` | empty | Sprite directory. Empty uses the bundled dinos. |
 | `count` | 3 | Number of dinos (1–100). |
-| `width`, `height` | 0 | Base size in px. 0 infers from the other value and the aspect ratio. Both 0 → 3× native size. Each dino gets a random size anywhere between 0.5× and 1.5× of the base, but never smaller than the native sprite. |
+| `size-min`, `size-max` | 24, 144 | Each dino's height is a random value in this range, in px. Width follows the sprite's aspect ratio. |
 | `fps` | 7 | Animation frames per second. |
-| `speed` | 15 | Movement steps per second. Each dino moves a random 5–15 px per step. |
+| `speed-min`, `speed-max` | 20, 1000 | Each dino's speed is a random value in this range, in px per second. |
 | `click-chance` | 20 | Percent chance that a click on an idle dino plays the click animation. |
 | `whole-screen` | false | Run at random heights across the whole screen instead of along the bottom. |
 | `hide-in-overview` | true | Hide dinos while the overview is open. |
